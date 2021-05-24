@@ -1,6 +1,6 @@
 dependencies:
-- name: postgresql
-  repository: https://charts.helm.sh/stable
-  version: 6.3.12
-digest: sha256:c8a555b20090935557573426c7fa8b3b503fd0849111f96e6d6f173e9f54c001
-generated: "2020-11-03T11:49:40.995709-08:00"
+- name: airflow
+  repository: https://airflow.apache.org
+  version: 1.0.0
+digest: sha256:020a118332ed622831db8042a7d8da2c2df1a1a83b3979ac926e995d226c5462
+generated: "2021-05-24T16:41:01.474122-06:00"
