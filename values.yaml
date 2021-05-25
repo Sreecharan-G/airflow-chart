@@ -55,6 +55,10 @@ airflow:
     livenessProbe:
       timeoutSeconds: 30
 
+    # TODO: WAITING ON UPSTREAM PR
+    #strategy:
+    #  type: Recreate
+
     affinity:
       podAntiAffinity:
         preferredDuringSchedulingIgnoredDuringExecution:
@@ -71,6 +75,29 @@ airflow:
   # Airflow webserver settings
   webserver:
     allowPodLogReading: false
+    # TODO: WAITING ON UPSTREAM PR
+    #webserverConfig: |
+    #  import os
+    #  from airflow import configuration as conf
+    #  from flask_appbuilder.security.manager import AUTH_REMOTE_USER
+    #  basedir = os.path.abspath(os.path.dirname(__file__))
+
+    #  # The SQLAlchemy connection string.
+    #  SQLALCHEMY_DATABASE_URI = conf.get('core', 'SQL_ALCHEMY_CONN')
+
+    #  # Flask-WTF flag for CSRF
+    #  CSRF_ENABLED = True
+
+    #  # ----------------------------------------------------
+    #  # AUTHENTICATION CONFIG
+    #  # ----------------------------------------------------
+    #  # TODO: Need a new way to toggle this
+    #  {{- if .Values.webserver.jwtSigningCertificateSecretName }}
+    #  AUTH_TYPE = AUTH_REMOTE_USER
+
+    #  from astronomer.flask_appbuilder.security import AirflowAstroSecurityManager
+    #  SECURITY_MANAGER_CLASS = AirflowAstroSecurityManager
+    #  {{- end }}
 
   # Airflow worker settings
   workers:
@@ -88,6 +115,86 @@ airflow:
   elasticsearch:
     connection:
       scheme: http
+
+  # TODO: WAITING ON UPSTREAM PR
+  #airflowLocalSettings: |
+  #  {{- if semverCompare "<1.10.12" .Values.airflowVersion }}
+
+  #  from airflow.contrib.kubernetes.pod import Pod
+  #  from airflow.configuration import conf
+
+  #  def pod_mutation_hook(pod: Pod):
+
+  #      extra_labels = {
+  #          "kubernetes_executor": "False",
+  #          "kubernetes_pod_operator": "False"
+  #      }
+
+  #      if 'airflow-worker' in pod.labels.keys() or \
+  #              conf.get('core', 'EXECUTOR') == "KubernetesExecutor":
+  #          extra_labels["kubernetes_executor"] = "True"
+  #      else:
+  #          extra_labels["kubernetes_pod_operator"] = "True"
+
+  #      pod.labels.update(extra_labels)
+  #      pod.tolerations += {{ toJson .Values.podMutation.tolerations }}
+  #      pod.affinity.update({{ toJson .Values.podMutation.affinity }})
+  #  {{- else }}
+  #  from kubernetes.client import models as k8s
+  #  from airflow.configuration import conf
+
+  #  def pod_mutation_hook(pod: k8s.V1Pod):
+
+  #      extra_labels = {
+  #          "kubernetes_executor": "False",
+  #          "kubernetes_pod_operator": "False"
+  #      }
+
+  #      if 'airflow-worker' in pod.metadata.labels.keys() or \
+  #              conf.get('core', 'EXECUTOR') == "KubernetesExecutor":
+  #          extra_labels["kubernetes_executor"] = "True"
+  #      else:
+  #          extra_labels["kubernetes_pod_operator"] = "True"
+
+  #      pod.metadata.labels.update(extra_labels)
+  #      if pod.spec.tolerations:
+  #          pod.spec.tolerations += {{ toJson .Values.podMutation.tolerations }}
+  #      else:
+  #          pod.spec.tolerations = {{ toJson .Values.podMutation.tolerations }}
+
+  #      if pod.spec.affinity:
+  #          pod.spec.affinity = pod.spec.affinity.to_dict().update({{ toJson .Values.podMutation.affinity }})
+  #      else:
+  #          pod.spec.affinity = {{ toJson .Values.podMutation.affinity }}
+
+  #  {{- end }}
+
+  # Config Settings for pod_mutation_hook
+  podMutation:
+    # Tolerations provided here would be applied using pod_mutation_hook
+    # So any pods spun up using KubernetesExecutor or KubernetesPodOperator will contain these tolerations.
+    tolerations: []
+    #  - key: "dynamic-pods"
+    #    operator: "Equal"
+    #    value: "true"
+    #    effect: "NoSchedule"
+
+    # Pods spun up would land in the node that matches the affinity
+    affinity: {}
+    #  nodeAffinity:
+    #    requiredDuringSchedulingIgnoredDuringExecution:
+    #      nodeSelectorTerms:
+    #        - matchExpressions:
+    #            - key: "astronomer.io/dynamic-pods"
+    #              operator: In
+    #              values:
+    #                - "true"
+
+  # TODO: WAITING ON UPSTREAM PR
+  #migrateDatabaseJob:
+  #  annotations:
+  #    "sidecar.istio.io/inject": "false"
+  # TODO: Should this also apply to the create user job?
 
 # Airflow Worker Config
 # TODO: should this be under airflow.workers just for consistency?
@@ -136,11 +243,11 @@ extraObjects: []
 
 # Extra annotations to apply to Create user job
 #createUserJobAnnotations: {}
-# TODO: needed on OSS chart
+# Moved to createUserJob.annotations
 
 # Extra annotations to apply to run migrations job
 #runMigrationsJobAnnotations: {}
-# TODO: needed on OSS chart
+# Moved to migrateDatabaseJob.annotations
 
 # Extra annotations to apply to service accounts
 #serviceAccountAnnotations: {}
@@ -202,27 +309,6 @@ extraObjects: []
 #  extraIniDatabaseResultBackend: ""
 #  extraIniPgbouncerConfig: ""
 #  # TODO: no equivalent on the OSS chart
-
-# Config Settings for pod_mutation_hook
-podMutation:
-  # Tolerations provided here would be applied using pod_mutation_hook
-  # So any pods spun up using KubernetesExecutor or KubernetesPodOperator will contain these tolerations.
-  tolerations: []
-  #  - key: "dynamic-pods"
-  #    operator: "Equal"
-  #    value: "true"
-  #    effect: "NoSchedule"
-
-  # Pods spun up would land in the node that matches the affinity
-  affinity: {}
-#    nodeAffinity:
-#      requiredDuringSchedulingIgnoredDuringExecution:
-#        nodeSelectorTerms:
-#          - matchExpressions:
-#              - key: "astronomer.io/dynamic-pods"
-#                operator: In
-#                values:
-#                  - "true"
 
 # This block contains settings strictly used to integrate into the Astronomer platform.
 # This is what allows for integration into platform ingress, network policies, metrics collection, etc.
