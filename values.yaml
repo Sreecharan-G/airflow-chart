@@ -248,49 +248,6 @@ ingress:
 #####################################
 # Leftovers
 
-# Extra annotations to apply to Create user job
-#createUserJobAnnotations: {}
-# Moved to createUserJob.annotations
-
-# Extra annotations to apply to run migrations job
-#runMigrationsJobAnnotations: {}
-# Moved to migrateDatabaseJob.annotations
-
-# Extra annotations to apply to service accounts
-#serviceAccountAnnotations: {}
-# Moved to respective sections: e.g. scheduler.serviceAccount.annotations
-
-# Enable RBAC (default on most clusters these days)
-#rbacEnabled: true
-# Moved to rbac.create (same default)
-
-# Pass a secret name here to mount all keys as environment variables in
-# the Airflow pods.
-#mountAllFromSecretName: ~
-# Moved to extraEnvFrom (same default, accepts different value)
-
-# Airflow Worker Config
-#workers:
-#  # Attach additional volume to celery workers (such as a shared file system)
-#  #additionalVolume:
-#  #  enabled: false
-#  #  volumeMode: ~
-#  #  accessMode: ~
-#  #  capacity: ~
-#  #  storageClassName:
-#  #  mountPath: ~
-#  #  volumePlugin: {}
-#  # Moved to workers.extraVolumes and workers.extraVolumeMounts (same default, accepts different value)
-
-# Airflow scheduler settings
-#scheduler:
-#  # This setting can overwrite
-#  # podMutation settings - be sure
-#  # to reference the default if you
-#  # are making use of those settings.
-#  #airflowLocalSettings: ~
-#  # Moved to airflowLocalSettings (same default)
-
 # Airflow webserver settings
 #webserver:
 #  # Secret that contains the cert to verify JWTs
@@ -302,14 +259,6 @@ ingress:
 #  networkPolicies:
 #    enabled: true
 #    # TODO: Do we really need a flag to disable just the networkpolicy for pgbouncer?
-#
-#  # ability to add more custom pgbouncer configuration
-#  extraIniDatabaseMetatdata: ""
-#  Moved to pgbouncer.extraIniMetadata
-#  extraIniDatabaseResultBackend: ""
-#  Moved to pgbouncer.extraIniResultBackend
-#  extraIniPgbouncerConfig: ""
-#  Moved to pgbouncer.extraIni
 
 # This block contains settings strictly used to integrate into the Astronomer platform.
 # This is what allows for integration into platform ingress, network policies, metrics collection, etc.

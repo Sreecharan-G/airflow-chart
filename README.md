@@ -60,6 +60,9 @@ The command deploys Airflow on the Kubernetes cluster in the default configurati
 > **Tip**: List all releases using `helm list`
 
 ## Upgrading the Chart
+
+First, look at the [updating documentation](UPDATING.md) to identify any backwards-incompatible changes.
+
 To upgrade the chart with the release name `my-release`:
 
 ```bash
