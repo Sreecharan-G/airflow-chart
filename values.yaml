@@ -194,6 +194,11 @@ airflow:
       default_queue: celery
     celery: # compat
       default_queue: celery
+    webserver:
+      expose_config: True
+      # TODO: base_url if ingress is set by platform
+    kubernetes:
+      dags_in_image: True
 
 # Airflow Worker Config
 # TODO: should this be under airflow.workers just for consistency?
