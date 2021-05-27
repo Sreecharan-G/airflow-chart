@@ -22,11 +22,6 @@ airflow:
   # Default airflow tag to deploy
   defaultAirflowTag: 2.0.0-buster
 
-  # Since this is a list, this isn't a good way to solve this...
-  env:
-    - name: ASTRONOMER__AIRFLOW__WORKER_LOG_RETENTION_DAYS
-      value: "3"
-
   # Astronomer Airflow images
   images:
     airflow:
@@ -196,9 +191,17 @@ airflow:
       default_queue: celery
     webserver:
       expose_config: True
-      # TODO: base_url if ingress is set by platform
+      base_url: '{{ .Values.ingress.enabled | ternary (printf "https://%s/%s/airflow" (include "deployments_subdomain" .) .Release.Name) "http://localhost:8080"}}'
+    elasticsearch:
+      elasticsearch_write_stdout: True
     kubernetes:
       dags_in_image: True
+    # TODO: Make this work
+    #astronomer:
+    #  {{- if .Values.webserver.jwtSigningCertificateSecretName }}
+    #  jwt_signing_cert = {{ template "airflow_webserver_jwt_cert_path" . }}
+    #  jwt_audience = {{ printf "%s/%s" ( include "deployments_subdomain" . ) .Release.Name }}
+    #  {{- end }}
 
 # Airflow Worker Config
 # TODO: should this be under airflow.workers just for consistency?
@@ -218,41 +221,32 @@ sccEnabled: false
 # Extra objects to deploy (these are passed through `tpl`)
 extraObjects: []
 
+# Ingress configuration
+ingress:
+  # Enable ingress resource
+  enabled: false
+
+  # Enable for cert-manager or kube-lego
+  acme: false
+
+  # Name of tls secret to use on ingress
+  tlsSecretName: ~
+
+  # Annotations always injected when configuring webserver Ingress object
+  webserverAnnotations: {}
+
+  # Annotations always injected when configuring Flower Ingress object
+  flowerAnnotations: {}
+
+  # Base domain for ingress vhosts
+  baseDomain: ~
+
+  # Enable platform authentication
+  auth:
+    enabled: true
+
 #####################################
 # Leftovers
-
-# Ingress configuration
-#ingress:
-#  # Enable ingress resource
-#  enabled: false
-#
-#  # Enable for cert-manager or kube-lego
-#  acme: false
-#  # TODO: MISSING
-#
-#  # Name of tls secret to use on ingress
-#  tlsSecretName: ~
-#  # Moved to ingress.web.tls.secretName and set ingress.web.tls.enable: true
-#  # Moved to ingress.flower.tls.secretName and set ingress.flower.tls.enable: true (double check)
-#
-#  # Annotations always injected when configuring webserver Ingress object
-#  webserverAnnotations: {}
-#  # Moved to ingress.web.annotations
-#
-#  # Annotations always injected when configuring Flower Ingress object
-#  flowerAnnotations: {}
-#  # Moved to ingress.flower.annotations
-#
-#  # Base domain for ingress vhosts
-#  baseDomain: ~
-#  # Moved to insgress.web.host
-#  # Moved to insgress.flower.host
-#
-#  # Enable platform authentication
-#  auth:
-#    enabled: true
-#  # TODO: What does this do
-# Moved to ingress.web, though not a direct replacement
 
 # Extra annotations to apply to Create user job
 #createUserJobAnnotations: {}
