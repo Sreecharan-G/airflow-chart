@@ -25,25 +25,18 @@ airflow:
   # Astronomer Airflow images
   images:
     airflow:
-      repository: quay.io/astronomer/ap-airflow
-      tag: ~
-      pullPolicy: IfNotPresent
     statsd:
       repository: quay.io/astronomer/ap-statsd-exporter
       tag: 0.18.0
-      pullPolicy: IfNotPresent
     redis:
       repository: quay.io/astronomer/ap-redis
       tag: 6.2.1
-      pullPolicy: IfNotPresent
     pgbouncer:
       repository: quay.io/astronomer/ap-pgbouncer
       tag: 1.8.1
-      pullPolicy: IfNotPresent
     pgbouncerExporter:
       repository: quay.io/astronomer/ap-pgbouncer-exporter
       tag: 0.9.2
-      pullPolicy: IfNotPresent
 
   # Airflow scheduler settings
   scheduler:
@@ -196,12 +189,10 @@ airflow:
       elasticsearch_write_stdout: True
     kubernetes:
       dags_in_image: True
-    # TODO: Make this work
-    #astronomer:
-    #  {{- if .Values.webserver.jwtSigningCertificateSecretName }}
-    #  jwt_signing_cert = {{ template "airflow_webserver_jwt_cert_path" . }}
-    #  jwt_audience = {{ printf "%s/%s" ( include "deployments_subdomain" . ) .Release.Name }}
-    #  {{- end }}
+    # Only required when running on the platform, but works elsewhere too
+    astronomer:
+      jwt_signing_cert: /etc/airflow/tls/tls.crt
+      jwt_audience: '{{ .Values.ingress.enabled | ternary (printf "%s/%s" ( include "deployments_subdomain" . ) .Release.Name) "" }}'
 
 # Airflow Worker Config
 # TODO: should this be under airflow.workers just for consistency?
