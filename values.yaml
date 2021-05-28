@@ -75,8 +75,7 @@ airflow:
       # ----------------------------------------------------
       # AUTHENTICATION CONFIG
       # ----------------------------------------------------
-      # TODO: Need a new way to toggle this (useAstroSecurityManager)
-      {{- if .Values.webserver.jwtSigningCertificateSecretName }}
+      {{- if .Values.useAstroSecurityManager }}
       AUTH_TYPE = AUTH_REMOTE_USER
 
       from astronomer.flask_appbuilder.security import AirflowAstroSecurityManager
@@ -194,6 +193,9 @@ airflow:
       jwt_signing_cert: /etc/airflow/tls/tls.crt
       jwt_audience: '{{ .Values.ingress.enabled | ternary (printf "%s/%s" ( include "deployments_subdomain" . ) .Release.Name) "" }}'
 
+  # Should the Astronomer Security Manager be used for the webserver
+  useAstroSecurityManager: False
+
 # Airflow Worker Config
 # TODO: should this be under airflow.workers just for consistency?
 # TODO: does the platform actually enable this in some cases?
@@ -243,7 +245,7 @@ ingress:
 #webserver:
 #  # Secret that contains the cert to verify JWTs
 #  #jwtSigningCertificateSecretName: ~
-#  # Moved to webserver.extraVolumes and webserver.extraVolumeMounts and new flag (useAstroSecurityManager)
+#  # Moved to webserver.extraVolumes and webserver.extraVolumeMounts and new flag (airflow.useAstroSecurityManager)
 
 # Pgbouncer settings
 #pgbouncer:
