@@ -246,33 +246,8 @@ ingress:
 #####################################
 # Leftovers
 
-# Airflow webserver settings
-#webserver:
-#  # Secret that contains the cert to verify JWTs
-#  #jwtSigningCertificateSecretName: ~
-#  # Moved to webserver.extraVolumes and webserver.extraVolumeMounts and new flag (airflow.useAstroSecurityManager)
-
 # Pgbouncer settings
 #pgbouncer:
 #  networkPolicies:
 #    enabled: true
-#    # TODO: Do we really need a flag to disable just the networkpolicy for pgbouncer?
-
-# This block contains settings strictly used to integrate into the Astronomer platform.
-# This is what allows for integration into platform ingress, network policies, metrics collection, etc.
-# This chart is completely deployable without specifying these values.
-platform:
-  release: ~
-  workspace: ""
-  # No "easy" answer right now:
-  #flower:
-  #  service.extraAnnotations:
-  #    astronomer.io/platform-release: {{ .Values.platform.release }}
-  #  extraNetworkPolicies:
-  #    - namespaceSelector: {}
-  #      podSelector:
-  #        matchLabels:
-  #          tier: nginx
-  #          component: ingress-controller
-  #          release: { { .Values.platform.release } }
-  # If we template extraAnnotations and extraNetworkPolicies, maybe we can make this a little nicer.
+#    # TODO: Originated from https://github.com/astronomer/issues/issues/2516
