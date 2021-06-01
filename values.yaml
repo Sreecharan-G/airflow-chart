@@ -56,10 +56,13 @@ airflow:
                     values:
                       - scheduler
               topologyKey: "kubernetes.io/hostname"
+    logGroomerSidecar:
+      args: ["/usr/local/bin/clean-airflow-logs"]
 
   # Airflow webserver settings
   webserver:
     allowPodLogReading: false
+    args: ["airflow", "webserver"]
     webserverConfig: |
       import os
       from airflow import configuration as conf
@@ -87,6 +90,8 @@ airflow:
     persistence:
       # Enable persistent volumes
       enabled: false
+    logGroomerSidecar:
+      args: ["/usr/local/bin/clean-airflow-logs"]
 
   # Pgbouncer settings
   pgbouncer:
