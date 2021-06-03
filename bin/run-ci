@@ -76,7 +76,6 @@ helm install \
   --set airflow.images.airflow.pullPolicy=Never \
   --set airflow.images.flower.pullPolicy=Never \
   --set airflow.data.metadataConnection.host="airflow-postgresql.airflow.svc.cluster.local" \
-  --set airflow.data.resultBackendConnection.host="airflow-postgresql.airflow.svc.cluster.local" \
   airflow \
   $HELM_CHART_PATH
 
